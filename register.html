@@ -1,0 +1,139 @@
+<!--
+Author: W3layouts
+Author URL: http://w3layouts.com
+License: Creative Commons Attribution 3.0 Unported
+License URL: http://creativecommons.org/licenses/by/3.0/
+-->
+<!DOCTYPE HTML>
+<html>
+<head>
+<title></title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+ <!-- Bootstrap Core CSS -->
+<link href="css/bootstrap.min.css" rel='stylesheet' type='text/css' />
+<!-- Custom CSS -->
+<link href="css/style.css" rel='stylesheet' type='text/css' />
+<link href="css/font-awesome.css" rel="stylesheet"> 
+<!-- jQuery -->
+<script src="js/jquery.min.js"></script>
+<!----webfonts--->
+<link href='http://fonts.googleapis.com/css?family=Roboto:400,100,300,500,700,900' rel='stylesheet' type='text/css'>
+<!---//webfonts--->  
+<!-- Bootstrap Core JavaScript -->
+<script src="js/bootstrap.min.js"></script>
+<script charset="utf-8" src="js/apiomat.js"></script>
+<script charset="utf-8" src="js/jstorage.js"></script>
+<script>
+$( document ).ready(function() {
+	
+    $('#s1').focus(function() {
+         $(this).prop('type', 'text');
+    }).blur(function() {
+         $(this).prop('type', 'password');
+    });
+
+});
+</script>
+</head>
+
+<body onload="init()" id="login">
+  <div class="login-logo">
+    <a href="index.html"><img src="images/logo.png" alt=""/></a>
+  </div>
+  <h2 class="form-heading">Daftar</h2>
+  <div class="form-signin app-cam" >
+      <p>Masukkan data personal anda : </p>
+      <input id="s0" type="text" class="form-control1" placeholder="Email" autofocus="">
+	  <input id="s1" type="password" class="form-control1" placeholder="Password">
+      <input id="s2" type="text" class="form-control1" placeholder="Nama Perusahaan"  autofocus="">
+    
+
+      <button id="buttonS" class="btn btn-lg btn-success1 btn-block" type="submit" onclick="daftar()">Submit</button>
+      <div class="registration">
+          Sudah Terdaftar?
+          <a class="" href="login.html">
+              Login
+          </a>
+      </div>
+  </div>
+   <div class="copy_layout login register">
+      <p id="statusS"></p>
+   </div>
+   
+</body>
+<script>
+
+var dataLength = 0;
+var buttonS = document.getElementById('buttonS');
+
+
+    function init() {
+        var user = new Apiomat.User();
+        user.setUserName("Admin");
+        user.setPassword("12345");
+        Apiomat.Datastore.configure(user);
+        var saveCB = {
+            onOk: function() {    
+            },
+            onError: function(error) {    
+            }
+        };
+        user.loadMe({
+            onOk: function() {
+            },
+            onError: function(error) {
+               
+                user.save(saveCB);
+            }
+        });
+    }
+
+
+   
+    function daftar() {
+		
+		var x = document.getElementById("s0").value;
+        var y = "email==" + '"' + x + '"';
+	
+		Apiomat.Perusahaan.getPerusahaans(y, {
+        onOk: function(data) {
+                for (var i = 0; i < data.length; i++) {
+                    dataLength = data.length;					
+                } console.log(dataLength);
+				if (dataLength == 1){document.getElementById("statusS").innerHTML = '&nbsp;'+ "Mohon maaf. email telah digunakan user lain"; dataLength = 0;} else {daftar_perusahaan()}
+            },
+            onError: function(error) {} });
+
+    }
+
+	
+	function daftar_perusahaan() {
+        dataLength = 0;
+        var a = document.getElementById("s0").value;
+        var b = document.getElementById("s1").value;
+        var c = document.getElementById("s2").value;
+		buttonS.style.display = (buttonS.style.display != 'visible') ? 'none' : '';
+
+        if (a != "" && b != "" && c != "") {
+            var task = new Apiomat.Perusahaan();
+            task.setEmail(a);
+            task.setPassword(b);
+			task.setNama_perusahaan(c);
+
+            task.save({
+                onOk: function() {
+                    document.getElementById("statusS").innerHTML = '&nbsp;'+ "Pendaftaran Berhasil. Silahkan Login";
+                }, onError: function(error) {}
+            });
+
+        } else {
+            document.getElementById("statusS").innerHTML = '&nbsp;'+"Mohon ulangi. isi semua data";
+            buttonS.style.display = (buttonS.style.display != 'none') ? 'visible' : '';
+        }
+    }
+
+</script>
+</html>

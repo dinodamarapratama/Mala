@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Redirecting Page </title>
+  <script src="js/jquery-1.9.1.min.js"></script>
+  <script src="js/jstorage.js"></script>
+  <script type='text/javascript'>
+  
+    function loadVal() {
+	var value1 = $.jStorage.get("key1");
+	var value2 = $.jStorage.get("key2");
+    if(!value1){ 
+     $.jStorage.set("key1","");
+     $.jStorage.set("key2","");
+     window.location.href ="login.html";
+    }
+    else {
+	window.location.href ="dashboard.html";
+   
+    }
+}
+ 
+</script>
+</head>
+
+<body onload="loadVal()" >
+<!-- style="background-image:url(../res/screen/android/screen-hdpi-portrait.jpg); background-attachment: fixed; background-repeat: repeat; background-size: cover; -->
+</body>
+</html>
+
