@@ -302,7 +302,7 @@ var listBarangjasa = '' ;
 	
 	total = [];
 	document.getElementById("total").innerHTML = '';
-     	listBarangjasa = "";
+    listBarangjasa = "";
 	var dataName = $('#listPayment li strong');
 	var data = $('#listPayment li a');
 	var dataX = $('#listPayment div input');
@@ -310,7 +310,7 @@ var listBarangjasa = '' ;
       //console.log(dataX[i].value);
 	  total.push(Number(data[i].innerHTML) * dataX[i].value) ;
 	  document.getElementById("total").innerHTML = _.sum(total);
-	  listBarangjasa +=  dataName[i].innerHTML +  " : " + dataX[i].value + " x " + data[i].innerHTML + "<br>" ;
+	  listBarangjasa +=  dataName[i].innerHTML +  " : " + dataX[i].value + " x " + data[i].innerHTML + " | " ;
 	  
     };
 

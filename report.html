@@ -39,6 +39,80 @@ $( document ).ready(function() {
 <script charset="utf-8" src="js/apiomat.js"></script>
 <script charset="utf-8" src="js/jstorage.js"></script>
 <script type="text/javascript"src="js/lodash.min.js"></script>
+
+<script type='text/javascript' src="js/jspdf.min.js"></script>
+    
+
+
+ <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+<script type='text/javascript'>
+
+$( document ).ready(function() {
+if ( $('[type="date"]').prop('type') != 'date' ) {
+    $('[type="date"]').datepicker();
+}
+});
+
+function printPDF(){
+  
+var time = document.getElementById("tanggalX").innerHTML ;  
+var queryTime = "laporan" + time +".pdf" ;     
+console.log(queryTime);   
+alert("generating pdf...");
+var doc = new jsPDF();
+var specialElementHandlers = {
+	'#editor': function(element, renderer){
+		return true;
+	}
+};
+doc.fromHTML($('#pdfBox').html(), 15, 15, {
+        'width': 170,
+            'elementHandlers': specialElementHandlers
+    });
+//doc.save('Test.pdf');
+
+var pdfOutput = doc.output();
+
+ 
+//NEXT SAVE IT TO THE DEVICE'S LOCAL FILE SYSTEM
+
+window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, function(fileSystem) {
+ 
+   alert(fileSystem.name);
+   alert(fileSystem.root.name);
+   alert(fileSystem.root.fullPath);
+ 
+   fileSystem.root.getFile(queryTime, {create: true}, function(entry) {
+      var fileEntry = entry;
+      alert(entry);
+ 
+      entry.createWriter(function(writer) {
+         writer.onwrite = function(evt) {
+         alert("Berhasil Disimpan");
+      };
+ 
+
+         writer.write( pdfOutput );
+      }, function(error) {
+         alert(error);
+      });
+ 
+   }, function(error){
+      alert(error);
+   });
+},
+function(event){
+ calert( evt.target.error.code );
+});
+
+
+
+
+}
+
+
+
+</script>
 </head>
 <body onload="init()">
 <div id="wrapper">
@@ -113,14 +187,29 @@ $( document ).ready(function() {
                     <div class="stats">
                       <h5><strong>Rp </strong><strong id="total"></strong></h5>
                       <span>Pendapatan Total</span><br><br>
-					 <button id="buttonS" onclick="sumVal()" type="button" class="btn btn-sm btn-warning warning_33">Total</button>
-			
+					  <button id="buttonS" onclick="sumVal()" type="button" class="btn btn-sm btn-warning warning_33">Total</button>
+			          <button id="buttonS" onclick="printPDF()" type="button" class="btn btn-sm btn-warning warning_33">Cetak PDF</button>
+                      <div id="editor"></div><br>	
                     </div> <br>
 					
 					<div id="statusS"></div>
                 </div>
 				
         	 </div>
+			 <div id="mydiv">
+            
+			</div>
+			 
+	   <div style="display:none" id="pdfBox" >
+	   
+	   
+	   </div>
+	   <p style="display:none" id="tanggalX"></p>
+<script>
+function myFunction() {
+    window.print();
+}
+</script>
 			 
             <div class="clearfix"> </div>
 	  </div>
@@ -147,7 +236,7 @@ var buttonS = document.getElementById('buttonS');
 var total = [];
 var arraySort = [] ;
 var listBarangjasa = [] ;
-
+var nama_perusahaan = "";
     
     function init() {
         var user = new Apiomat.User();
@@ -162,7 +251,9 @@ var listBarangjasa = [] ;
         };
         user.loadMe({
             onOk: function() {
-			loadTask();
+			loadUser();
+			
+			
             },
             onError: function(error) {
                 user.save(saveCB);
@@ -172,7 +263,7 @@ var listBarangjasa = [] ;
 	
     function loadTask() {
 	
-	
+
 var date = new Date();
 var minute = date.getMinutes();
 var hour = date.getHours();
@@ -180,8 +271,11 @@ var day = ("0" + date.getDate()).slice(-2);
 var month = ("0" + (date.getMonth() + 1)).slice(-2);
 var year = date.getFullYear();
 var time_1 = year + "-" + month + "-" + day;
-
-
+document.getElementById("tanggalX").innerHTML = time_1;
+		document.getElementById("pdfBox").innerHTML += "<h3 >LAPORAN PENJUALAN </h3>" ;
+		document.getElementById("pdfBox").innerHTML += "<p >Nama Perusahaan : " +  nama_perusahaan + "<p>" ;
+		document.getElementById("pdfBox").innerHTML += "<p>Tanggal : " + time_1 + "</p>" ;
+		document.getElementById("pdfBox").innerHTML += "-------------------------------------------------";
 	
         var y = "id_email==" + '"' + v1 + '"' + " and " + "tanggal==" + '"' + time_1 + '"' ;
 	
@@ -196,15 +290,35 @@ var time_1 = year + "-" + month + "-" + day;
             onError: function(error) {} });	
     }
 	
-	
+	function loadUser() {
+		
+        var y = "email==" + '"' + v1 + '"';
+	 
+		Apiomat.Perusahaan.getPerusahaans(y, {
+        onOk: function(data) {
+                for (var i = 0; i < data.length; i++) {
+				nama_perusahaan =  data[i].getNama_perusahaan();
+                }loadTask();;
+            },
+            onError: function(error) {} });	
+			
+			
+    }
 	
 	function searchReports() {
 	
 	   document.getElementById("listBarangjasa").innerHTML = "";
+	   document.getElementById("pdfBox").innerHTML = "";
+       var time_1 = document.getElementById("dateQuery").value;
+       document.getElementById("tanggalX").innerHTML = time_1;
+
+		document.getElementById("pdfBox").innerHTML += "<h3 >LAPORAN PENJUALAN </h3>" ;
+		document.getElementById("pdfBox").innerHTML += "<p >Nama Perusahaan : " +  nama_perusahaan + "<p>" ;
+		document.getElementById("pdfBox").innerHTML += "<p>Tanggal : " + time_1 + "</p>" ;
+		document.getElementById("pdfBox").innerHTML += "-------------------------------------------------";
         
 		arraySort = [];
-        var time_1 = document.getElementById("dateQuery").value;
- 
+        
        console.log(time_1);
 	
         var y = "id_email==" + '"' + v1 + '"' + " and " + "tanggal==" + '"' + time_1 + '"' ;
@@ -226,14 +340,22 @@ var time_1 = year + "-" + month + "-" + day;
 				
 		var z = "id==id"+'('+data[i].ID +')'  ;
 		
+		
+
+
 		Apiomat.Laporan_penjualan.getLaporan_penjualans(z, {
         onOk: function(data) {
                 for (var i = 0; i < data.length; i++) {
 				
 				   
-					document.getElementById("listBarangjasa").innerHTML += " <div class='activity-row'> <div class='col-xs-2'><a href='#'><i class='fa fa-clock-o text-info icon_13'></i></a></div> <div class='col-xs-8 activity-desc'> <h5>Jam : "+data[i].getJam()+"</h5> <p style='display:inline'>Total Pendapatan : </p><strong style='display:inline' > "+data[i].getPendapatan()+"</strong><br><br><h5>Daftar</h5> <h6>"+data[i].getDaftar_barangJasa()+"</h6> </div>  <div class='clearfix'> </div>  </div>" ;
-	
-                };
+					document.getElementById("listBarangjasa").innerHTML += " <div class='activity-row'> <div class='col-xs-2'><a href='#'><i class='fa fa-clock-o text-info icon_13'></i></a></div> <div class='col-xs-10 activity-desc'> <h5>Jam : "+data[i].getJam()+"</h5> <p style='display:inline'>Total Pendapatan : </p><strong style='display:inline' > "+data[i].getPendapatan()+"</strong><br><br><h5>Daftar</h5> <h6>"+data[i].getDaftar_barangJasa()+"</h6> </div>  <div class='clearfix'> </div>  </div>" ;
+	                
+                    document.getElementById("pdfBox").innerHTML += "<p><b>Jam Transaksi : </b>"+data[i].getJam()+"</p><p><b>Daftar</b>	: [ "+data[i].getDaftar_barangJasa()+" ]</p>" ;
+                    document.getElementById("pdfBox").innerHTML += "<p><b>Total Pendapatan :</b>"+data[i].getPendapatan()+"</p>";
+					document.getElementById("pdfBox").innerHTML += "-------------------------------------------------";
+					document.getElementById("pdfBox").innerHTML += "<br>";
+				
+				};
             },
             onError: function(error) {} });	
 					 
@@ -257,7 +379,13 @@ var time_1 = year + "-" + month + "-" + day;
    
 
 	
+	
+	function logout() {
+     	
+	 $.jStorage.flush();
+	 setTimeout(function() { window.location.href = "index.html"}, 2000);
 
+    }
 
 	
     

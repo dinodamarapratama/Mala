@@ -328,7 +328,13 @@ var buttonS = document.getElementById('buttonS');
     }
 
 
+function logout() {
+     	
+	 $.jStorage.flush();
+	 setTimeout(function() { window.location.href = "index.html"}, 2000);
 
+    }
+	
 
 	
     

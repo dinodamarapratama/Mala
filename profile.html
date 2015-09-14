@@ -221,7 +221,13 @@ var v2 = $.jStorage.get("key2")
     }
 	
 	
+function logout() {
+     	
+	 $.jStorage.flush();
+	 setTimeout(function() { window.location.href = "index.html"}, 2000);
 
+    }
+	
 
 
 
